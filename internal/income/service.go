@@ -57,3 +57,7 @@ func (is *incomeService) UpdateIncomeService(ctx context.Context, incomeId, user
 func (is *incomeService) DeleteIncomeService(ctx context.Context, incomeId, userId int) error {
 	return is.repo.DeleteIncome(ctx, incomeId, userId)
 }
+
+func (is *incomeService) FilterByCategoryService(ctx context.Context, category string, userId int) ([]*income, error) {
+	return is.repo.FilterByCategory(ctx, category, userId)
+}

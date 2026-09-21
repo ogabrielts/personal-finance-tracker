@@ -92,16 +92,16 @@ func (eh *expenseHandler) GetAllExpensesHandler(w http.ResponseWriter, r *http.R
 }
 
 func (eh *expenseHandler) UpdateExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value("token").(utils.Claims)
+	if !ok {
+		http.Error(w, "token failure", http.StatusInternalServerError)
+		return
+	}
+
 	idStr := r.PathValue("id")
 	expenseId, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	user, ok := r.Context().Value("token").(utils.Claims)
-	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
 		return
 	}
 
@@ -124,6 +124,12 @@ func (eh *expenseHandler) UpdateExpenseHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (eh *expenseHandler) DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value("token").(utils.Claims)
+	if !ok {
+		http.Error(w, "token failure", http.StatusInternalServerError)
+		return
+	}
+
 	idStr := r.PathValue("id")
 	expenseId, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -131,12 +137,6 @@ func (eh *expenseHandler) DeleteExpenseHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	
-	user, ok := r.Context().Value("token").(utils.Claims)
-	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
-		return
-	}
-
 	if err := eh.service.DeleteExpenseService(r.Context(), expenseId, user.UserId); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -145,4 +145,28 @@ func (eh *expenseHandler) DeleteExpenseHandler(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("expense deleted")
+}
+
+func (eh *expenseHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value("token").(utils.Claims)
+	if !ok {
+		http.Error(w, "token failure", http.StatusInternalServerError)
+		return
+	}
+
+	var expenseReq expenseRequest
+	if err := json.NewDecoder(r.Body).Decode(&expenseReq); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	expenses, err := eh.service.FilterByCategoryService(r.Context(), expenseReq.Category, user.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(expenses)
 }

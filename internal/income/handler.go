@@ -144,3 +144,27 @@ func (ih *incomeHandler) DeleteIncomeHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("income deleted")
 }
+
+func (ih *incomeHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value("token").(utils.Claims)
+	if !ok {
+		http.Error(w, "token failure", http.StatusInternalServerError)
+		return
+	}
+
+	var incomeReq incomeRequest
+	if err := json.NewDecoder(r.Body).Decode(&incomeReq); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	incomes, err := ih.service.FilterByCategoryService(r.Context(), incomeReq.Category, user.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(incomes)
+}

@@ -105,3 +105,39 @@ func (edb *expenseDB) DeleteExpense(ctx context.Context, expenseId, userId int) 
 
 	return nil
 }
+
+func (edb *expenseDB) FilterByCategory(ctx context.Context, category string, userId int) ([]*expense, error) {
+	var expenses []*expense
+
+	rows, err := edb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_category = $1 AND expense_user = $2", category, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query data: %w", err)
+	}
+	defer rows.Close()
+
+	var id, user int
+	var name, expenseCategory string
+	var value float32
+
+	for rows.Next() {
+		if err := rows.Scan(&id, &name, &value, &expenseCategory, &user); err != nil {
+			return nil, fmt.Errorf("failed to query data: %w", err)
+		}
+
+		expense := &expense{
+			ExpenseId: id,
+			ExpenseName: name,
+			ExpenseValue: value,
+			ExpenseCategory: expenseCategory,
+			ExpenseUser: user,
+		}
+
+		expenses = append(expenses, expense)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to query data: %w", err)
+	}
+	
+	return expenses, nil
+}

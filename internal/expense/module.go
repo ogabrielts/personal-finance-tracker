@@ -22,7 +22,9 @@ func NewModule(db *sql.DB) *expenseModule {
 func (em *expenseModule) ExpenseRouter(mux *http.ServeMux, auth func(http.HandlerFunc) http.HandlerFunc) {
 	mux.HandleFunc("POST /v1/expense", auth(em.handler.CreateExpenseHandler))
 	mux.HandleFunc("GET /v1/expense", auth(em.handler.GetAllExpensesHandler))
-	mux.HandleFunc("GET /v1/expense/{id}", auth(em.handler.GetExpenseByIdHandler))
-	mux.HandleFunc("PUT /v1/expense/{id}", auth(em.handler.UpdateExpenseHandler))
-	mux.HandleFunc("DELETE /v1/expense/{id}", auth(em.handler.DeleteExpenseHandler))
+	mux.HandleFunc("GET /v1/expense/entry/{id}", auth(em.handler.GetExpenseByIdHandler))
+	mux.HandleFunc("PUT /v1/expense/entry/{id}", auth(em.handler.UpdateExpenseHandler))
+	mux.HandleFunc("DELETE /v1/expense/entry/{id}", auth(em.handler.DeleteExpenseHandler))
+
+	mux.HandleFunc("GET /v1/expense/filter/category", auth(em.handler.FilterByCategoryHandler))
 }

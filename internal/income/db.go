@@ -105,3 +105,39 @@ func (idb *incomeDB) DeleteIncome(ctx context.Context, incomeId, userId int) err
 
 	return nil
 }
+
+func (idb *incomeDB) FilterByCategory(ctx context.Context, category string, userId int) ([]*income, error) {
+	var incomes []*income
+
+	rows, err := idb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_category = $1 AND income_user = $2", category, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query data: %w", err)
+	}
+	defer rows.Close()
+
+	var id, user int
+	var name, incomeCategory string
+	var value float32
+
+	for rows.Next() {
+		if err := rows.Scan(&id, &name, &value, &incomeCategory, &user); err != nil {
+			return nil, fmt.Errorf("failed to query data: %w", err)
+		}
+
+		income := &income{
+			IncomeId: id,
+			IncomeName: name,
+			IncomeValue: value,
+			IncomeCategory: incomeCategory,
+			IncomeUser: user,
+		}
+
+		incomes = append(incomes, income)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to query data: %w", err)
+	}
+
+	return incomes, nil	
+}

@@ -22,7 +22,9 @@ func NewModule(db *sql.DB) *incomeModule {
 func (im *incomeModule) IncomeRouter(mux *http.ServeMux, auth func(http.HandlerFunc) http.HandlerFunc) {
 	mux.HandleFunc("POST /v1/income", auth(im.handler.CreateIncomeHandler))
 	mux.HandleFunc("GET /v1/income", auth(im.handler.GetAllIncomesHandler))
-	mux.HandleFunc("GET /v1/income/{id}", auth(im.handler.GetIncomeByIdHandler))
-	mux.HandleFunc("PUT /v1/income/{id}", auth(im.handler.UpdateIncomeHandler))
-	mux.HandleFunc("DELETE /v1/income/{id}", auth(im.handler.DeleteIncomeHandler))
+	mux.HandleFunc("GET /v1/income/entry/{id}", auth(im.handler.GetIncomeByIdHandler))
+	mux.HandleFunc("PUT /v1/income/entry/{id}", auth(im.handler.UpdateIncomeHandler))
+	mux.HandleFunc("DELETE /v1/income/entry/{id}", auth(im.handler.DeleteIncomeHandler))
+
+	mux.HandleFunc("GET /v1/income/filter/category", auth(im.handler.FilterByCategoryHandler))
 }

@@ -8,4 +8,6 @@ type incomeRepository interface {
 	GetAllIncomes(ctx context.Context, userId int) ([]*income, error)
 	UpdateIncome(ctx context.Context, income *income) error
 	DeleteIncome(ctx context.Context, incomeId, userId int) error
+
+	FilterByCategory(ctx context.Context, category string, userId int) ([]*income, error)
 }
