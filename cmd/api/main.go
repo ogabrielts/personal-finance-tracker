@@ -3,6 +3,10 @@ package main
 import (
 	"database/sql"
 	"expense-api/config"
+	"expense-api/internal/auth"
+	"expense-api/internal/expense"
+	"expense-api/internal/income"
+	"expense-api/internal/middleware"
 	"expense-api/internal/user"
 	"log"
 	"net/http"
@@ -21,11 +25,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	authModule := auth.NewModule(db)
 	userModule := user.NewModule(db)
+	expenseModule := expense.NewModule(db)
+	incomeModule := income.NewModule(db)
 
 	mux := http.NewServeMux()
 
+	authModule.AuthRouter(mux)
 	userModule.UserRouter(mux)
+	expenseModule.ExpenseRouter(mux, middleware.Authenticate)
+	incomeModule.IncomeRouter(mux, middleware.Authenticate)
 
 	log.Printf("Server is running...")
 	log.Fatal(http.ListenAndServe(config.Address, mux))
