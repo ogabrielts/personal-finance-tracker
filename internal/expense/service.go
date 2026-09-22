@@ -61,3 +61,7 @@ func (es *expenseService) DeleteExpenseService(ctx context.Context, expenseId, u
 func (es *expenseService) FilterByCategoryService(ctx context.Context, category string, userId int) ([]*expense, error) {
 	return es.repo.FilterByCategory(ctx, category, userId)
 }
+
+func (es *expenseService) FilterByDateService(ctx context.Context, dateFrom, dateTo string, userId int) ([]*expense, error) {
+	return es.repo.FilterByDate(ctx, dateFrom, dateTo, userId)
+}

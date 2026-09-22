@@ -10,4 +10,5 @@ type incomeRepository interface {
 	DeleteIncome(ctx context.Context, incomeId, userId int) error
 
 	FilterByCategory(ctx context.Context, category string, userId int) ([]*income, error)
+	FilterByDate(ctx context.Context, dateFrom, dateTo string, userId int) ([]*income, error) 
 }

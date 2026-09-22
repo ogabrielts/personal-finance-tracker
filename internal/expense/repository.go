@@ -10,4 +10,5 @@ type expenseRepository interface {
 	DeleteExpense(ctx context.Context, expenseId, userId int) error
 
 	FilterByCategory(ctx context.Context, category string, userId int) ([]*expense, error)
+	FilterByDate(ctx context.Context, dateFrom, dateTo string, userId int) ([]*expense, error) 
 }

@@ -27,4 +27,5 @@ func (em *expenseModule) ExpenseRouter(mux *http.ServeMux, auth func(http.Handle
 	mux.HandleFunc("DELETE /v1/expense/entry/{id}", auth(em.handler.DeleteExpenseHandler))
 
 	mux.HandleFunc("GET /v1/expense/filter/category", auth(em.handler.FilterByCategoryHandler))
+	mux.HandleFunc("GET /v1/expense/filter/date", auth(em.handler.FilterByDateHandler))
 }

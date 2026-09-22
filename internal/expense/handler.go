@@ -170,3 +170,32 @@ func (eh *expenseHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(expenses)
 }
+
+func (eh *expenseHandler) FilterByDateHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value("token").(utils.Claims)
+	if !ok {
+		http.Error(w, "token failure", http.StatusInternalServerError)
+		return
+	}
+
+	type dateReq struct {
+		DateFrom string `json:"datefrom"`
+		DateTo string `json:"dateto"`
+	}
+
+	var dates dateReq
+	if err := json.NewDecoder(r.Body).Decode(&dates); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	expenses, err := eh.service.FilterByDateService(r.Context(), dates.DateFrom, dates.DateTo, user.UserId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(expenses)
+}
