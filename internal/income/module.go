@@ -26,6 +26,6 @@ func (im *incomeModule) IncomeRouter(mux *http.ServeMux, auth func(http.HandlerF
 	mux.HandleFunc("PUT /v1/income/entry/{id}", auth(im.handler.UpdateIncomeHandler))
 	mux.HandleFunc("DELETE /v1/income/entry/{id}", auth(im.handler.DeleteIncomeHandler))
 
-	mux.HandleFunc("GET /v1/income/filter/category", auth(im.handler.FilterByCategoryHandler))
-	mux.HandleFunc("GET /v1/income/filter/date", auth(im.handler.FilterByDateHandler))
+	mux.HandleFunc("POST /v1/income/filter/category", auth(im.handler.FilterByCategoryHandler))
+	mux.HandleFunc("POST /v1/income/filter/date", auth(im.handler.FilterByDateHandler))
 }
