@@ -7,7 +7,7 @@ README.md
 *.env
 .env.*
 
-tests/
+*/tests/
 
 Dockerfile
 docker-compose.yaml

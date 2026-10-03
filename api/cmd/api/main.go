@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"expense-api/config"
-	"expense-api/internal/auth"
-	"expense-api/internal/expense"
-	"expense-api/internal/income"
-	"expense-api/internal/middleware"
-	"expense-api/internal/reports"
-	"expense-api/internal/user"
+	"expense-api/api/config"
+	"expense-api/api/internal/auth"
+	"expense-api/api/internal/expense"
+	"expense-api/api/internal/income"
+	"expense-api/api/internal/middleware"
+	"expense-api/api/internal/reports"
+	"expense-api/api/internal/user"
 	"log"
 	"net/http"
 

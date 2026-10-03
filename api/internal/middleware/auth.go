@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"expense-api/internal/utils"
+	"expense-api/api/internal/utils"
 	"net/http"
 )
 

@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"errors"
-	"expense-api/internal/utils"
+	"expense-api/api/internal/utils"
 )
 
 type userService struct {

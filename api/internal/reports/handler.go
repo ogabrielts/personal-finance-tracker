@@ -2,7 +2,7 @@ package reports
 
 import (
 	"encoding/json"
-	"expense-api/internal/utils"
+	"expense-api/api/internal/utils"
 	"net/http"
 )
 
