@@ -2,7 +2,10 @@ package components
 
 import (
 	"expense-api/tui/internal/api"
+	"expense-api/tui/internal/utils"
 	"flag"
+	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -16,5 +19,30 @@ func List(client *http.Client, args []string) error {
 		return err
 	}
 
-	return petapi.List(client, *listAccount, *listId, *listAll)
+	res, err := petapi.List(client, *listAccount, *listId, *listAll)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("Failed to list %s: %s\n", *listAccount, res.Status)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	if *listAll {
+		if err := utils.DisplayMultipleData(*listAccount, body); err != nil {
+			return err
+		}
+	} else {
+		if err := utils.DisplaySingleData(*listAccount, body); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

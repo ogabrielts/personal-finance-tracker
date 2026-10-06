@@ -2,11 +2,10 @@ package petapi
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 )
 
-func List(client *http.Client, account, id string, all bool) error {
+func List(client *http.Client, account, id string, all bool) (*http.Response, error) {
 	var urlAdr string
 
 	if all {
@@ -17,23 +16,15 @@ func List(client *http.Client, account, id string, all bool) error {
 
 	req, err := http.NewRequest("GET", urlAdr, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(body))
-
-	return nil
+	
+	return res, nil
 }

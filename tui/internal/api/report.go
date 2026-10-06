@@ -3,18 +3,16 @@ package petapi
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 )
 
-func Report(client *http.Client, month string, year int, all bool) error {
+func Report(client *http.Client, month string, year int, all bool) (*http.Response, error) {
 	reqBody, err := json.Marshal(map[string]any{
 		"month": month,
 		"year": year,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var	urlAdr string
@@ -26,23 +24,15 @@ func Report(client *http.Client, month string, year int, all bool) error {
 
 	req, err := http.NewRequest("POST", urlAdr, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Println(string(body))
-
-	return nil
+	return res, nil
 }

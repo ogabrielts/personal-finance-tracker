@@ -29,7 +29,7 @@ func (ah *authHandler) LogInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	
 	user, err := ah.service.LogInService(r.Context(), userReq.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -37,7 +37,7 @@ func (ah *authHandler) LogInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !utils.CheckPassword(userReq.Password, user.UserPassword) {
-		http.Error(w, "invalid credentials", http.StatusBadRequest)
+		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
