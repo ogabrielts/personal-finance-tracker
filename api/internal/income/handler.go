@@ -2,6 +2,7 @@ package income
 
 import (
 	"encoding/json"
+	"errors"
 	"expense-api/api/internal/utils"
 	"net/http"
 	"strconv"
@@ -26,7 +27,7 @@ type incomeRequest struct {
 func (ih *incomeHandler) CreateIncomeHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -50,7 +51,7 @@ func (ih *incomeHandler) CreateIncomeHandler(w http.ResponseWriter, r *http.Requ
 func (ih *incomeHandler) GetIncomeByIdHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -63,6 +64,10 @@ func (ih *incomeHandler) GetIncomeByIdHandler(w http.ResponseWriter, r *http.Req
 
 	income, err := ih.service.GetIncomeByIdService(r.Context(), incomeId, user.UserId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -75,12 +80,16 @@ func (ih *incomeHandler) GetIncomeByIdHandler(w http.ResponseWriter, r *http.Req
 func (ih *incomeHandler) GetAllIncomesHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
 	expenses, err := ih.service.GetAllIncomesService(r.Context(), user.UserId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -93,7 +102,7 @@ func (ih *incomeHandler) GetAllIncomesHandler(w http.ResponseWriter, r *http.Req
 func (ih *incomeHandler) UpdateIncomeHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -124,7 +133,7 @@ func (ih *incomeHandler) UpdateIncomeHandler(w http.ResponseWriter, r *http.Requ
 func (ih *incomeHandler) DeleteIncomeHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -148,7 +157,7 @@ func (ih *incomeHandler) DeleteIncomeHandler(w http.ResponseWriter, r *http.Requ
 func (ih *incomeHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -160,6 +169,10 @@ func (ih *incomeHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http.
 
 	incomes, err := ih.service.FilterByCategoryService(r.Context(), incomeReq.Category, user.UserId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -172,7 +185,7 @@ func (ih *incomeHandler) FilterByCategoryHandler(w http.ResponseWriter, r *http.
 func (ih *incomeHandler) FilterByDateHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -190,6 +203,10 @@ func (ih *incomeHandler) FilterByDateHandler(w http.ResponseWriter, r *http.Requ
 
 	incomes, err := ih.service.FilterByDateService(r.Context(), dates.DateFrom, dates.DateTo, user.UserId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

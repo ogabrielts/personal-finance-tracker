@@ -2,6 +2,7 @@ package reports
 
 import (
 	"encoding/json"
+	"errors"
 	"expense-api/api/internal/utils"
 	"net/http"
 )
@@ -24,12 +25,16 @@ func newHandler(service *reportsService) *reportsHandler {
 func (rh *reportsHandler) allReportHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
 	report, err := rh.service.GetAllExpensesService(r.Context(), user.UserId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -42,7 +47,7 @@ func (rh *reportsHandler) allReportHandler(w http.ResponseWriter, r *http.Reques
 func (rh *reportsHandler) monthlyReportHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("token").(utils.Claims)
 	if !ok {
-		http.Error(w, "token failure", http.StatusInternalServerError)
+		http.Error(w, "access failure", http.StatusNotFound)
 		return
 	}
 
@@ -54,6 +59,10 @@ func (rh *reportsHandler) monthlyReportHandler(w http.ResponseWriter, r *http.Re
 	
 	report, err := rh.service.MonthlyReportService(r.Context(), user.UserId, reportReq.Month, reportReq.Year)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

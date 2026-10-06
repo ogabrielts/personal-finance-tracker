@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"expense-api/api/internal/utils"
 	"fmt"
 )
 
@@ -30,6 +32,9 @@ func (udb *userDB) GetUserById(ctx context.Context, id int) (*user, error) {
 
 	err := udb.db.QueryRowContext(ctx, "SELECT user_id, user_name, user_email, user_password, user_address FROM pet_user WHERE user_id = $1", id).Scan(&user.UserId, &user.UserName, &user.UserEmail, &user.UserPassword, &user.UserAddress)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 
@@ -41,6 +46,9 @@ func (udb *userDB) GetUserByEmail(ctx context.Context, email string) (*user, err
 
 	err := udb.db.QueryRowContext(ctx, "SELECT user_id, user_name, user_email, user_password, user_address FROM pet_user WHERE user_email = $1", email).Scan(&user.UserId, &user.UserName, &user.UserEmail, &user.UserPassword, &user.UserAddress)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 

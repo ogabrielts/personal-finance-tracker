@@ -3,6 +3,8 @@ package income
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"expense-api/api/internal/utils"
 	"fmt"
 )
 
@@ -30,6 +32,9 @@ func (idb *incomeDB) GetIncomeById(ctx context.Context, incomeId, userId int) (*
 
 	err := idb.db.QueryRowContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_id = $1 AND income_user = $2", incomeId, userId).Scan(&income.IncomeId, &income.IncomeName, &income.IncomeValue, &income.IncomeCategory, &income.IncomeUser)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 
@@ -41,6 +46,9 @@ func (idb *incomeDB) GetAllIncomes(ctx context.Context, userId int) ([]*income, 
 
 	rows, err := idb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_user = $1", userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -111,6 +119,9 @@ func (idb *incomeDB) FilterByCategory(ctx context.Context, category string, user
 
 	rows, err := idb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_category = $1 AND income_user = $2", category, userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -147,6 +158,9 @@ func (idb *incomeDB) FilterByDate(ctx context.Context, dateFrom, dateTo string, 
 
 	rows, err := idb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_user = $1 AND created_at >= $2 AND created_at < $3", userId, dateFrom, dateTo)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()

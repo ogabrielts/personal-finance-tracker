@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"expense-api/api/internal/utils"
 	"fmt"
 )
 
@@ -21,6 +23,10 @@ func (adb *authDB) GetUser(ctx context.Context, email string) (*authUser, error)
 
 	err := adb.db.QueryRowContext(ctx, "SELECT user_id, user_name, user_email, user_password FROM pet_user WHERE user_email = $1", email).Scan(&user.UserId, &user.UserName, &user.UserEmail, &user.UserPassword)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound 
+		}
+
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 

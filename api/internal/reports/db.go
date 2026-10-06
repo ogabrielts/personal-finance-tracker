@@ -3,6 +3,8 @@ package reports
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"expense-api/api/internal/utils"
 	"fmt"
 )
 
@@ -21,6 +23,9 @@ func (rdb *reportsDB) GetAllExpenses(ctx context.Context, userId int) ([]*expens
 
 	rows, err := rdb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_user = $1", userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -57,6 +62,9 @@ func (rdb *reportsDB) GetAllIncomes(ctx context.Context, userId int) ([]*income,
 
 	rows, err := rdb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_user = $1", userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -94,6 +102,9 @@ func (rdb *reportsDB) GetExpensesByDate(ctx context.Context, userId int, dateFro
 
 	rows, err := rdb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_user = $1 AND created_at >= $2 AND created_at < $3", userId, dateFrom, dateTo)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -130,6 +141,9 @@ func (rdb *reportsDB) GetIncomesByDate(ctx context.Context, userId int, dateFrom
 
 	rows, err := rdb.db.QueryContext(ctx, "SELECT income_id, income_name, income_value, income_category, income_user FROM pet_income WHERE income_user = $1 AND created_at >= $2 AND created_at < $3", userId, dateFrom, dateTo)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()

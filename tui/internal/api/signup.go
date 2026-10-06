@@ -3,11 +3,10 @@ package petapi
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 )
 
-func SignUp(name, email, password, address string) ([]byte, error) {
+func SignUp(name, email, password, address string) (*http.Response, error) {
 	reqBody, err := json.Marshal(map[string]string{
 		"name": name,
 		"email": email,
@@ -22,12 +21,6 @@ func SignUp(name, email, password, address string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
+	return res, nil
 }

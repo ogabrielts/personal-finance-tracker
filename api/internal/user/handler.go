@@ -2,6 +2,8 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
+	"expense-api/api/internal/utils"
 	"net/http"
 	"strconv"
 )
@@ -52,6 +54,9 @@ func (uh *userHandler) GetUserByIdHandler(w http.ResponseWriter, r *http.Request
 
 	user, err := uh.service.GetUserByIdService(r.Context(), id)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

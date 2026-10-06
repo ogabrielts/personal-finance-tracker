@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"errors"
 	"expense-api/api/internal/utils"
 	"net/http"
 	"time"
@@ -32,6 +33,11 @@ func (ah *authHandler) LogInHandler(w http.ResponseWriter, r *http.Request) {
 	
 	user, err := ah.service.LogInService(r.Context(), userReq.Email)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

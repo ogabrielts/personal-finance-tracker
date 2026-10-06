@@ -3,6 +3,8 @@ package expense
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"expense-api/api/internal/utils"
 	"fmt"
 )
 
@@ -41,6 +43,9 @@ func (edb *expenseDB) GetAllExpenses(ctx context.Context, userId int) ([]*expens
 
 	rows, err := edb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_user = $1", userId)
 	if err != nil {
+		if errors.Is(err, utils.ErrNotFound) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -111,6 +116,9 @@ func (edb *expenseDB) FilterByCategory(ctx context.Context, category string, use
 
 	rows, err := edb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_category = $1 AND expense_user = $2", category, userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()
@@ -147,6 +155,9 @@ func (edb *expenseDB) FilterByDate(ctx context.Context, dateFrom, dateTo string,
 
 	rows, err := edb.db.QueryContext(ctx, "SELECT expense_id, expense_name, expense_value, expense_category, expense_user FROM pet_expense WHERE expense_user = $1 AND created_at >= $2 AND created_at < $3", userId, dateFrom, dateTo)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNotFound
+		}
 		return nil, fmt.Errorf("failed to query data: %w", err)
 	}
 	defer rows.Close()

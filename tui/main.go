@@ -5,23 +5,69 @@ import (
 	"expense-api/tui/internal/utils"
 	"fmt"
 	"log"
+
+	"golang.org/x/term"
 )
 
 func main() {
+	fmt.Println("Enter with your account or create a new one")
+	fmt.Println("'enter' to log in | 'create' to create a new account")
+	start, err := utils.Input(">>> ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch start {
+	case "create":
+		name, err := utils.Input("Name: ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		email, err := utils.Input("Email: ")
+		if err != nil {
+			log.Fatal(err)
+		}
+	
+		fmt.Print("Password: ")
+		password, err := term.ReadPassword(0)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		address, err := utils.Input("Address: ")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if err := components.SignUp(name, email, string(password), address); err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("\nUser successfully created.\n\n")
+		fmt.Println("------------------------------")
+
+	case "enter":
+		break
+	}
+
 	email, err := utils.Input("Email: ")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	password, err := utils.Input("Password: ")
+	fmt.Print("Password: ")
+	password, err := term.ReadPassword(0)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client, err := components.SignIn(email, password)
+	client, err := components.SignIn(email, string(password))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Printf("\nUser successfully logged in.\n\n")
+	fmt.Println("------------------------------")
 
 	for {
 		cmd, err := utils.Input("pet= ")
