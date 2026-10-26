@@ -109,6 +109,11 @@ func main() {
 				log.Fatal(err)
 			}
 
+		case "filter":
+			if err := components.Filter(client, args[1:]); err != nil {
+				log.Fatal(err)
+			}
+
 		default:
 			fmt.Println("Unknown command")
 		}
